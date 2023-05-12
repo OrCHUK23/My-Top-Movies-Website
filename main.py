@@ -31,8 +31,9 @@ def home():
     movies = db.session.query(Movies).order_by(Movies.rating.desc()).all()
 
     # Loop through the movies and assign them the "ranking" by their place.
+    num_movies = len(movies)
     for i, movie in enumerate(movies):
-        movie.ranking = 10 - i
+        movie.ranking = num_movies - i
         db.session.add(movie)
     db.session.commit()  # Commit the changes to the db.
     return render_template("index.html", movies=movies, len=len(movies))
@@ -69,7 +70,7 @@ def rate_movie():
     """
     form = RateMovieForm()  # Create new form.
     movie_id = request.args.get('id')  # Get the wanted movie to edit.
-    movie_to_update = db.session.query(Movies).get(movie_id)
+    movie_to_update = db.session.get(Movies, movie_id)
     if movie_to_update is not None:  # If the movie was found.
         if form.validate_on_submit():  # Check if the form was sent successfully.
             # Try to edit the db to the new data.
@@ -137,7 +138,7 @@ def add_movie():
 def movie_details():
     # Get the movie ID
     movie_id = request.args.get('id')
-    movie_to_show = db.session.query(Movies).get(movie_id)
+    movie_to_show = db.session.get(Movies, movie_id)
     if movie_to_show is not None:  # Check if succeeded pulling the movie.
         return render_template('movie_details.html', movie=movie_to_show) # Render the page...
     return redirect(url_for('home'))

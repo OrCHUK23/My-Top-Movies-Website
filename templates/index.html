@@ -31,11 +31,11 @@
                 <label>{{ movie.rating }}</label>
               <i class="fas fa-star star"></i>
             </div>
-              <p class="review">"{{ movie.review }}"</p>
+            <p class="review">"{{ movie.review }}"</p>
             <p class="overview">{{ movie.description }}</p>
             <a href="{{ url_for('rate_movie', id=movie.id) }}" class="button">Edit</a>
-            <a href="{{ url_for('delete', id=movie.id) }}" class="button delete-button">Delete</a>
-            <a href="{{ url_for('movie_details', id=movie.id) }}" class="button primary">More details</a>
+            <a href="{{ url_for('movie_details', id=movie.id) }}" class="button">More details</a>
+            <a href="{{ url_for('delete', id=movie.id) }}" class="button delete-button" onclick="return confirm('Are you sure you want to delete {{ movie.title }} from the list?')">Delete</a>
           </div>
         </div>
       </div>
