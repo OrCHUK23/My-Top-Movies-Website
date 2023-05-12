@@ -1,28 +1,28 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, get_flashed_messages
+from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_bootstrap import Bootstrap
 from forms import RateMovieForm, FindMovieForm
 from config import init_app, db, create_app
 from sqlalchemy.exc import SQLAlchemyError
-from models import Movies
-import os
 from dotenv import load_dotenv
+from models import Movies
 import requests
+import os
 
 # Initialize Flask, Bootstrap and DB.
 app = Flask(__name__)
 Bootstrap(app)
 init_app(app)
-
-MOVIE_DB_SEARCH_URL = "https://api.themoviedb.org/3/search/movie?"
-
 create_app(app)
 
+# Sets the API endpoint.
+MOVIE_DB_SEARCH_URL = "https://api.themoviedb.org/3/search/movie?"
+
 # Load .env variables and get rid of the quotes in them.
-load_dotenv("E:\Python\EnvironmentVariables\.env")
+load_dotenv("E:/Python/EnvironmentVariables/.env")
 app.config['SECRET_KEY'] = os.getenv("APP_SECRET_KEY").replace('"', '')
 TMDB_API_KEY = os.getenv("TMDB_API_KEY").replace('"', '')
 
-# Desired movies list length.
+# Sets the desired movies list length.
 LIST_LEN = 10
 
 @app.route("/")
