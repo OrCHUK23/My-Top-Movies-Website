@@ -8,30 +8,28 @@ import os
 from dotenv import load_dotenv
 import requests
 
+# Initialize Flask, Bootstrap and DB.
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 Bootstrap(app)
 init_app(app)
 
-# Configure the "The Movie Database" API key.
-# TMDB_API_KEY = "4a28abb8e4029298f9d249e2c8944907"
 MOVIE_DB_SEARCH_URL = "https://api.themoviedb.org/3/search/movie?"
 
 create_app(app)
 
-# Load secret API key from local env.
+# Load .env variables and get rid of the quotes in them.
 load_dotenv("E:\Python\EnvironmentVariables\.env")
-
-# Get rid of the quotes in the API Key.
+app.config['SECRET_KEY'] = os.getenv("APP_SECRET_KEY").replace('"', '')
 TMDB_API_KEY = os.getenv("TMDB_API_KEY").replace('"', '')
 
-# Set the desired list length.
+# Desired movies list length.
 LIST_LEN = 10
 
 @app.route("/")
 def home():
-    # Order the movies by their rating with descending order
+    # Order the movies by descending order.
     movies = db.session.query(Movies).order_by(Movies.rating.desc()).all()
+
     # Loop through the movies and assign them the "ranking" by their place.
     for i, movie in enumerate(movies):
         movie.ranking = 10 - i
