@@ -103,7 +103,7 @@ def fetch_movies_list():
 
 
 @app.route('/find')
-def find_movie():
+def add_movie():
     """
     Function handles selection for particular movie in movies list.
     When the user clicks the desired movie, it will search the movie by ID
