@@ -26,7 +26,7 @@ def home():
     for i, movie in enumerate(movies):
         movie.ranking = 10 - i
         db.session.add(movie)
-    db.session.commit()
+    db.session.commit()  # Commit the changes to the db.
     return render_template("index.html", movies=movies)
 
 
