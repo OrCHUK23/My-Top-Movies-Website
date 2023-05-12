@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, get_flashed_messages
 from flask_bootstrap import Bootstrap
 from forms import RateMovieForm, FindMovieForm
 from config import init_app, db, create_app
@@ -25,18 +25,43 @@ load_dotenv("E:\Python\EnvironmentVariables\.env")
 # Get rid of the quotes in the API Key.
 TMDB_API_KEY = os.getenv("TMDB_API_KEY").replace('"', '')
 
+# Set the desired list length.
+LIST_LEN = 10
 
 @app.route("/")
 def home():
     # Order the movies by their rating with descending order
     movies = db.session.query(Movies).order_by(Movies.rating.desc()).all()
-
     # Loop through the movies and assign them the "ranking" by their place.
     for i, movie in enumerate(movies):
         movie.ranking = 10 - i
         db.session.add(movie)
     db.session.commit()  # Commit the changes to the db.
-    return render_template("index.html", movies=movies)
+    return render_template("index.html", movies=movies, len=len(movies))
+
+
+@app.route('/add', methods=['GET', 'POST'])
+def fetch_movies_list():
+    """
+    Function finds movie list by movie title.
+    :return: List of the movies, if found.
+    """
+    if db.session.query(Movies).count() >= LIST_LEN:  # Check if reached maximum movies.
+        flash("You have reached the maximum number of movies in the list.\nDelete a movie to add another one.", 'warning')
+    else:
+        form = FindMovieForm()
+        if form.validate_on_submit():
+            movie_title = form.title.data  # Get the movies list that match the search.
+            # Makes an API call.
+            response = requests.get(f"{MOVIE_DB_SEARCH_URL}", params={"api_key": TMDB_API_KEY, "query": movie_title})
+            data = response.json()["results"]
+            if response.status_code == 200 and data:  # Checks if the API call and json fetching was successful.
+                return render_template("select.html", movies=data)
+            else:
+                print(f"FAIL! \n{response.text}")
+                return redirect(url_for('home'))
+        return render_template("add.html", form=form)
+    return redirect(url_for('home'))
 
 
 @app.route('/rate_movie', methods=["GET", "POST"])
@@ -80,26 +105,6 @@ def delete():
         db.session.delete(movie_to_delete)
         db.session.commit()
     return redirect(url_for('home'))
-
-
-@app.route('/add', methods=['GET', 'POST'])
-def fetch_movies_list():
-    """
-    Function finds movie list by movie title.
-    :return: List of the movies, if found.
-    """
-    form = FindMovieForm()
-    if form.validate_on_submit():
-        movie_title = form.title.data  # Get the movies list that match the search.
-        # Makes an API call.
-        response = requests.get(f"{MOVIE_DB_SEARCH_URL}", params={"api_key": TMDB_API_KEY, "query": movie_title})
-        data = response.json()["results"]
-        if response.status_code == 200 and data:  # Checks if the API call and json fetching was successful.
-            return render_template("select.html", movies=data)
-        else:
-            print(f"FAIL! \n{response.text}")
-            return redirect(url_for('home'))
-    return render_template("add.html", form=form)
 
 
 @app.route('/find')

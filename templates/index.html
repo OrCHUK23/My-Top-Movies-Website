@@ -14,7 +14,7 @@
 {% block content %}
 <div class="container">
   <h1 class="heading">My Top 10 Movies</h1>
-  <p class="description">These are my all-time favourite movies.</p>
+  <h1 class="heading">Currently number of movies in the list: {{ len }}</h1>
     <div class="container text-center add">
         <a href="{{ url_for('fetch_movies_list') }}" class="button">Add New Movie</a>
     </div>
@@ -40,4 +40,30 @@
     {% endfor %}
 </div>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      {% if category == 'warning' %}
+        <div id="warning-message" class="alert alert-warning" role="alert">{{ message }}</div>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<script>
+  window.onload = function() {
+    var warningMessage = document.getElementById('warning-message');
+    if (warningMessage) {
+      var confirmed = confirm(warningMessage.textContent);
+      if (confirmed) {
+        window.location.href = "{{ url_for('home') }}";
+      }
+    }
+  };
+</script>
+
+
 {% endblock %}
+
+
+
