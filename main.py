@@ -3,6 +3,9 @@ from flask_bootstrap import Bootstrap
 from forms import RateMovieForm, FindMovieForm
 from config import init_app, db, create_app
 from models import Movies
+import os
+from dotenv import load_dotenv
+
 import requests
 
 app = Flask(__name__)
@@ -11,10 +14,16 @@ Bootstrap(app)
 init_app(app)
 
 # Configure the "The Movie Database" API key.
-TMDB_API_KEY = "4a28abb8e4029298f9d249e2c8944907"
+# TMDB_API_KEY = "4a28abb8e4029298f9d249e2c8944907"
 MOVIE_DB_SEARCH_URL = "https://api.themoviedb.org/3/search/movie?"
 
 create_app(app)
+
+# Load secret API key from local env.
+load_dotenv("E:\Python\EnvironmentVariables\.env")
+
+# Get rid of the quotes in the API Key.
+TMDB_API_KEY = os.getenv("TMDB_API_KEY").replace('"', '')
 
 
 @app.route("/")
@@ -78,8 +87,15 @@ def add_movie():
         movie_title = form.title.data  # Get the movies list that match the search.
         # Make an API call.
         response = requests.get(f"{MOVIE_DB_SEARCH_URL}", params={"api_key": TMDB_API_KEY, "query": movie_title})
-        data = response.json()["results"]
-        return render_template("select.html", movies=data)
+        if response.status_code == 200:
+            print("SUCCESS!")
+            data = response.json()["results"]
+            return render_template("select.html", movies=data)
+        else:
+            print(f"FAIL! \n{response.text}")
+            print(TMDB_API_KEY)
+
+            return redirect(url_for('home'))
     return render_template("add.html", form=form)
 
 
@@ -93,7 +109,8 @@ def find_movie():
     """
     movie_api_id = request.args.get('id')
     if movie_api_id:  # Check if a movie id was entered.
-        response = requests.get(f'https://api.themoviedb.org/3/movie/{movie_api_id}?api_key={TMDB_API_KEY}')
+        response = requests.get(
+            f'https://api.themoviedb.org/3/movie/{movie_api_id}?api_key={TMDB_API_KEY}')
         if response.status_code == 200:  # Check if there are results to the API call.
             # Try to add the data to the db.
             try:
