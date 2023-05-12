@@ -67,11 +67,8 @@ def rate_movie():
     """
     Function handles the 'edit' button for each movie.
     """
-    # Create new form.
-    form = RateMovieForm()
-
-    # Get the wanted movie to edit.
-    movie_id = request.args.get('id')
+    form = RateMovieForm()  # Create new form.
+    movie_id = request.args.get('id')  # Get the wanted movie to edit.
     movie_to_update = db.session.query(Movies).get(movie_id)
     if movie_to_update is not None:  # If the movie was found.
         if form.validate_on_submit():  # Check if the form was sent successfully.
@@ -82,10 +79,9 @@ def rate_movie():
                 db.session.commit()
             except SQLAlchemyError as e:
                 db.session.rollback()
-                flash('An error occurred while updating the movie.')
+                flash(f'An error occurred while updating the movie.\n{e}')
             finally:
                 return redirect(url_for('home'))  # Redirect the user to homepage.
-
     else:  # Movie was not found
         return redirect(url_for('home'))  # Redirect the user to homepage.
     return render_template('rate_movie.html', form=form, movie=movie_to_update)
@@ -136,6 +132,16 @@ def add_movie():
             except Exception as e:
                 db.session.rollback()
     return redirect(url_for('home'))
+
+@app.route('/details', methods=["GET", "POST"])
+def movie_details():
+    # Get the movie ID
+    movie_id = request.args.get('id')
+    movie_to_show = db.session.query(Movies).get(movie_id)
+    if movie_to_show is not None:  # Check if succeeded pulling the movie.
+        return render_template('movie_details.html', movie=movie_to_show) # Render the page...
+    return redirect(url_for('home'))
+
 
 
 if __name__ == '__main__':

@@ -46,6 +46,16 @@
 	 position: relative;
 }
 
+ .subheading {
+	 width: 100%;
+	 margin-left: 1rem;
+	 font-weight: 100;
+	 font-size: 1.618rem;
+	 padding-bottom: 0.5em;
+	 margin-bottom: 1rem;
+	 position: relative;
+}
+
 /*
  .heading:after {
 	 display: block;
@@ -215,4 +225,7 @@
 }
  .release_date {
 	 font-weight: normal;
+}
+img {
+  max-width: 40%;
 }
