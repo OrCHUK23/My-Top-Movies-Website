@@ -83,7 +83,7 @@ def delete():
 
 
 @app.route('/add', methods=['GET', 'POST'])
-def add_movie():
+def fetch_movies_list():
     """
     Function finds movie list by movie title.
     :return: List of the movies, if found.
@@ -91,16 +91,13 @@ def add_movie():
     form = FindMovieForm()
     if form.validate_on_submit():
         movie_title = form.title.data  # Get the movies list that match the search.
-        # Make an API call.
+        # Makes an API call.
         response = requests.get(f"{MOVIE_DB_SEARCH_URL}", params={"api_key": TMDB_API_KEY, "query": movie_title})
-        if response.status_code == 200:
-            print("SUCCESS!")
-            data = response.json()["results"]
+        data = response.json()["results"]
+        if response.status_code == 200 and data:  # Checks if the API call and json fetching was successful.
             return render_template("select.html", movies=data)
         else:
             print(f"FAIL! \n{response.text}")
-            print(TMDB_API_KEY)
-
             return redirect(url_for('home'))
     return render_template("add.html", form=form)
 
