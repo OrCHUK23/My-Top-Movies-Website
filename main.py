@@ -1,11 +1,11 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_bootstrap import Bootstrap
 from forms import RateMovieForm, FindMovieForm
 from config import init_app, db, create_app
+from sqlalchemy.exc import SQLAlchemyError
 from models import Movies
 import os
 from dotenv import load_dotenv
-
 import requests
 
 app = Flask(__name__)
@@ -52,11 +52,17 @@ def rate_movie():
     movie_to_update = db.session.query(Movies).get(movie_id)
     if movie_to_update is not None:  # If the movie was found.
         if form.validate_on_submit():  # Check if the form was sent successfully.
-            # If so, try to edit the db to the new data.
-            movie_to_update.rating = request.form['rating']
-            movie_to_update.review = request.form['review']
-            db.session.commit()
-            return redirect(url_for('home'))  # Redirect the user to homepage.
+            # Try to edit the db to the new data.
+            try:
+                movie_to_update.rating = request.form['rating']
+                movie_to_update.review = request.form['review']
+                db.session.commit()
+            except SQLAlchemyError as e:
+                db.session.rollback()
+                flash('An error occurred while updating the movie.')
+            finally:
+                return redirect(url_for('home'))  # Redirect the user to homepage.
+
     else:  # Movie was not found
         return redirect(url_for('home'))  # Redirect the user to homepage.
     return render_template('rate_movie.html', form=form, movie=movie_to_update)

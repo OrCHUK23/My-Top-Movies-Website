@@ -4,6 +4,7 @@ Config file to initialize the db.
 
 from flask_sqlalchemy import SQLAlchemy
 
+
 # Configure the SQLite database, relative to the app instance folder.
 DATABASE_URI = "sqlite:///movies-collection.db"
 
