@@ -25,6 +25,7 @@ TMDB_API_KEY = os.getenv("TMDB_API_KEY").replace('"', '')
 # Sets the desired movies list length.
 LIST_LEN = 10
 
+
 @app.route("/")
 def home():
     # Order the movies by descending order.
@@ -46,12 +47,13 @@ def fetch_movies_list():
     :return: List of the movies, if found.
     """
     if db.session.query(Movies).count() >= LIST_LEN:  # Check if reached maximum movies.
-        flash("You have reached the maximum number of movies in the list.\nDelete a movie to add another one.", 'warning')
+        flash("You have reached the maximum number of movies in the list.\nDelete a movie to add another one.",
+              'warning')
     else:
         form = FindMovieForm()
         if form.validate_on_submit():
             movie_title = form.title.data  # Get the movies list that match the search.
-            # Makes an API call.
+            # Make an API call.
             response = requests.get(f"{MOVIE_DB_SEARCH_URL}", params={"api_key": TMDB_API_KEY, "query": movie_title})
             data = response.json()["results"]
             if response.status_code == 200 and data:  # Checks if the API call and json fetching was successful.
@@ -134,15 +136,15 @@ def add_movie():
                 db.session.rollback()
     return redirect(url_for('home'))
 
+
 @app.route('/details', methods=["GET", "POST"])
 def movie_details():
     # Get the movie ID
     movie_id = request.args.get('id')
     movie_to_show = db.session.get(Movies, movie_id)
     if movie_to_show is not None:  # Check if succeeded pulling the movie.
-        return render_template('movie_details.html', movie=movie_to_show) # Render the page...
+        return render_template('movie_details.html', movie=movie_to_show)  # Render the page...
     return redirect(url_for('home'))
-
 
 
 if __name__ == '__main__':
