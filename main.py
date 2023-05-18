@@ -3,6 +3,7 @@ from flask_bootstrap import Bootstrap
 from forms import RateMovieForm, FindMovieForm
 from config import init_app, db, create_app
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import exc
 from dotenv import load_dotenv
 from models import Movies
 import requests
@@ -132,7 +133,7 @@ def add_movie():
                 db.session.add(movie)
                 db.session.commit()
                 return redirect(url_for('rate_movie', id=movie.id))
-            except Exception as e:
+            except exc.IntegrityError:
                 db.session.rollback()
     return redirect(url_for('home'))
 
