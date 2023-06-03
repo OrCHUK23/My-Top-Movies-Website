@@ -20,6 +20,7 @@ The project directory structure is as follows:
   - `css/styles.css`: CSS styles for the application.
   
 ### Installation
+
 To run the application, follow these steps:
 
 1. Clone the repository: `git clone https://github.com/OrCHUK23/My-Top-Movies-Website.git`
@@ -75,6 +76,7 @@ wsproto==1.2.0
 WTForms==3.0.1
 
 ### HTML Templates
+
 Here are the HTML templates used in the application:
 
 - `index.html`: Displays the user's top-rated movies.
