@@ -22,7 +22,7 @@ The project directory structure is as follows:
 ### Installation
 To run the application, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/your-username/your-repo.git`
+1. Clone the repository: `git clone https://github.com/OrCHUK23/My-Top-Movies-Website.git`
 2. Install the required packages: `pip install -r requirements.txt`
 3. Run the Flask development server: `flask run`
 
